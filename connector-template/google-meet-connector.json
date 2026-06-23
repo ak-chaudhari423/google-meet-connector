@@ -1,0 +1,500 @@
+{
+  "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name": "google-meet-connector",
+  "id": "io.camunda.google-meet.connector.template",
+  "version": 17,
+  "description": "Create, schedule, update, and cancel Google Meet meetings directly from Camunda workflows. Supports attendee invitations, calendar events, and Meet link generation using Google APIs.",
+  "category": {
+    "id": "connectors",
+    "name": "Connectors"
+  },
+  "appliesTo": [
+    "bpmn:Task"
+  ],
+  "elementType": {
+    "value": "bpmn:ServiceTask"
+  },
+  "groups": [
+    {
+      "id": "authentication",
+      "label": "Authentication"
+    },
+    {
+      "id": "operation",
+      "label": "Operation"
+    },
+    {
+      "id": "parameters",
+      "label": "Parameters"
+    },
+    {
+      "id": "requestBody",
+      "label": "Request Body"
+    },
+    {
+      "id": "output",
+      "label": "Response mapping"
+    },
+    {
+      "id": "errors",
+      "label": "Error handling"
+    },
+    {
+      "id": "retries",
+      "label": "Retries"
+    }
+  ],
+  "properties": [
+    {
+      "type": "Hidden",
+      "value": "io.camunda:http-json:1",
+      "binding": {
+        "type": "zeebe:taskDefinition",
+        "property": "type"
+      }
+    },
+    {
+      "id": "accesstoken",
+      "label": "Access Token",
+      "description": "Enter Access Token",
+      "type": "String",
+      "group": "authentication",
+      "feel": "optional",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "accesstoken"
+      },
+      "constraints": {
+        "notEmpty": true
+      }
+    },
+    {
+      "id": "meetingOperation",
+      "label": "Meeting Option",
+      "description": "Select Meeting Operation",
+      "type": "Dropdown",
+      "group": "operation",
+      "value": "instantMeeting",
+      "choices": [
+        {
+          "name": "Instant Meeting",
+          "value": "instantMeeting"
+        },
+        {
+          "name": "Schedule Meeting In Calendar",
+          "value": "scheduleMeetingInCalendar"
+        },
+        {
+          "name": "Update Meeting",
+          "value": "updateMeeting"
+        },
+        {
+          "name": "Cancel Meeting",
+          "value": "cancelMeeting"
+        }
+      ],
+      "binding": {
+        "type": "zeebe:input",
+        "name": "meetingOperation"
+      },
+      "constraints": {
+        "notEmpty": true
+      }
+    },
+    {
+      "id": "summary",
+      "label": "summary",
+      "description": "Enter the Summary",
+      "feel": "optional",
+      "type": "Text",
+      "group": "requestBody",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "summary"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "oneOf": [
+          "updateMeeting",
+          "scheduleMeetingInCalendar",
+          "cancelMeeting"
+        ]
+      }
+    },
+    {
+      "id": "description",
+      "label": "Description",
+      "description": "Enter the Description",
+      "feel": "optional",
+      "type": "Text",
+      "group": "requestBody",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "description"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "oneOf": [
+          "updateMeeting",
+          "scheduleMeetingInCalendar",
+          "cancelMeeting"
+        ]
+      }
+    },
+    {
+      "id": "startTime",
+      "label": "Start Time",
+      "description": "eg. 2026-06-25T10:00:00Z",
+      "feel": "optional",
+      "type": "Text",
+      "group": "requestBody",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "startTime"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "oneOf": [
+          "updateMeeting",
+          "scheduleMeetingInCalendar"
+        ]
+      }
+    },
+    {
+      "id": "endTime",
+      "label": "End Time",
+      "description": "eg. 2026-06-25T10:00:00Z  OR  2026-06-25T15:30:00+05:30 OR 026-06-25T10:00:00 with TimeZone",
+      "feel": "optional",
+      "type": "Text",
+      "group": "requestBody",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "endTime"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "oneOf": [
+          "updateMeeting",
+          "scheduleMeetingInCalendar"
+        ]
+      }
+    },
+    {
+      "id": "timeZone",
+      "label": "Time Zone",
+      "description": "eg. Asia/Kolkata",
+      "feel": "optional",
+      "value": "",
+      "type": "Text",
+      "group": "requestBody",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "timeZone"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "oneOf": [
+          "updateMeeting",
+          "scheduleMeetingInCalendar"
+        ]
+      }
+    },
+    {
+      "id": "attendees",
+      "label": "Enter Attendees Emails (JSON)",
+      "description": "Example: [{\"email\":\"abc@gmail.com\"},{\"email\":\"xyz@gmail.com\"}]",
+      "feel": "optional",
+      "type": "Text",
+      "group": "requestBody",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "attendees"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "oneOf": [
+          "updateMeeting",
+          "scheduleMeetingInCalendar"
+        ]
+      }
+    },
+    {
+      "id": "eventId",
+      "label": "Event ID",
+      "description": "Google Calendar Event ID",
+      "type": "Text",
+      "feel": "optional",
+      "group": "parameters",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "eventId"
+      },
+      "constraints": {
+        "notEmpty": true
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "oneOf": [
+          "updateMeeting",
+          "cancelMeeting"
+        ]
+      }
+    },
+    {
+      "id": "url",
+      "label": "API URL",
+      "description": "Google API URL",
+      "type": "Hidden",
+      "value": " https://meet.googleapis.com/v2/spaces",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "url"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "instantMeeting"
+      }
+    },
+    {
+      "id": "baseUrl",
+      "value": "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+      "binding": {
+        "name": "baseUrl",
+        "type": "zeebe:input"
+      },
+      "type": "Hidden"
+    },
+    {
+      "id": "url",
+      "label": "API URL",
+      "description": "Google API URL",
+      "type": "Hidden",
+      "value": "= baseUrl + \"?conferenceDataVersion=1\"",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "url"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "scheduleMeetingInCalendar"
+      }
+    },
+    {
+      "id": "updateUrl",
+      "type": "Hidden",
+      "value": "= baseUrl + \"/\" + eventId + \"?sendUpdates=all\"",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "url"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "updateMeeting"
+      }
+    },
+    {
+      "id": "deleteUrl",
+      "type": "Hidden",
+      "value": "= baseUrl + \"/\" + eventId + \"?sendUpdates=all\"",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "url"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "cancelMeeting"
+      }
+    },
+    {
+      "id": "createMethod",
+      "type": "Hidden",
+      "value": "POST",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "method"
+      }
+    },
+    {
+      "id": "deleteMethod",
+      "type": "Hidden",
+      "value": "DELETE",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "method"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "cancelMeeting"
+      }
+    },
+    {
+      "id": "updateMethod",
+      "type": "Hidden",
+      "value": "PUT",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "method"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "updateMeeting"
+      }
+    },
+    {
+      "type": "Hidden",
+      "value": "application/json",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "headers.ContentType"
+      }
+    },
+    {
+      "type": "Hidden",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "headers.Authorization"
+      },
+      "value": "= \"Bearer \" + accesstoken"
+    },
+    {
+      "id": "requestId",
+      "type": "Hidden",
+      "value": "= \"meeting-\" + string(now())",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "requestId"
+      }
+    },
+    {
+      "label": "Request Body",
+      "type": "Hidden",
+      "value": "={\"summary\": summary,\"description\": description,\"start\":{\"dateTime\": startTime,\"timeZone\": if timeZone != null and timeZone != \"\" then timeZone else \"\"},\"end\":{\"dateTime\": endTime,\"timeZone\": if timeZone != null and timeZone != \"\" then timeZone else \"\"},\"attendees\": from json(attendees),\"conferenceData\":{\"createRequest\":{\"requestId\": requestId}}}",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "body"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "scheduleMeetingInCalendar"
+      }
+    },
+    {
+      "id": "updateBody",
+      "label": "Request Body",
+      "type": "Hidden",
+      "value": "={\"summary\": summary,\"description\": description,\"start\":{\"dateTime\": startTime,\"timeZone\": if timeZone = null or timeZone = \"\" then \"\" else timeZone},\"end\":{\"dateTime\": endTime,\"timeZone\": if timeZone = null or timeZone = \"\" then \"\" else timeZone},\"attendees\": from json(attendees),\"conferenceData\":{\"createRequest\":{\"requestId\": requestId}}}",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "body"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "updateMeeting"
+      }
+    },
+    {
+      "id": "cancelBody",
+      "label": "Request Body",
+      "type": "Hidden",
+      "value": "={\"summary\": summary,\"description\": description}",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "body"
+      },
+      "condition": {
+        "property": "meetingOperation",
+        "equals": "cancelMeeting"
+      }
+    },
+    {
+      "label": "Result Variable",
+      "description": "Process variable to store response",
+      "type": "String",
+      "group": "output",
+      "value": "result",
+      "binding": {
+        "type": "zeebe:taskHeader",
+        "key": "resultVariable"
+      }
+    },
+    {
+      "label": "Result Expression",
+      "description": "Expression to map the response into process variables",
+      "type": "Text",
+      "group": "output",
+      "feel": "required",
+      "value": "={ result: response.body }",
+      "binding": {
+        "type": "zeebe:taskHeader",
+        "key": "resultExpression"
+      }
+    },
+    {
+      "id": "errorExpression",
+      "label": "Error expression",
+      "description": "Expression to handle errors. Details in the <a href=\"https://docs.camunda.io/docs/components/connectors/use-connectors/\" target=\"_blank\">documentation</a>.",
+      "feel": "required",
+      "type": "Text",
+      "group": "errors",
+      "binding": {
+        "key": "errorExpression",
+        "type": "zeebe:taskHeader"
+      }
+    },
+    {
+      "id": "connectionTimeout",
+      "label": "Connection timeout",
+      "description": "Timeout in seconds (0 for infinite)",
+      "group": "retries",
+      "type": "String",
+      "value": "120",
+      "binding": {
+        "type": "zeebe:input",
+        "name": "connectionTimeoutInSeconds"
+      }
+    },
+    {
+      "id": "retryCount",
+      "label": "Retries",
+      "description": "Number of retries",
+      "value": "3",
+      "feel": "optional",
+      "group": "retries",
+      "binding": {
+        "property": "retries",
+        "type": "zeebe:taskDefinition"
+      },
+      "type": "String"
+    },
+    {
+      "id": "retryBackoff",
+      "label": "Retry backoff",
+      "description": "ISO-8601 duration to wait between retries",
+      "value": "PT0S",
+      "group": "retries",
+      "binding": {
+        "key": "retryBackoff",
+        "type": "zeebe:taskHeader"
+      },
+      "type": "String"
+    }
+  ],
+  "icon": {
+    "contents": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAHgCAYAAAB91L6VAAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nO3df5Cd1X3f8eOYGo8NTWN2sRm3nUnGf3jqvbtCIEDixwqhH6t9zt3nLM3Gbv+hCStNx9OYaWdaHGdsQTA/QgyOCZBxcZBRQYZF+zxaJItqsHRX8Y+2LjhNZqgTZ8D2xNhDiV1wgwMrW09nLYixEdLu2Xvv5znf5/2aef+dvSf2+Yysq7POAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIjwvc3n33Z0vlUR0cpa6LReXui0fnC003rq6PzQf1/oDH12oTP0O0cPD2+pDg6/Xf3fdQA18szaNdc9s3aN/OIist5CZ2jh6PzQFxc6rX9fdf7Fu9T/3QdQg/FlgIn628L80I8X5lv7j3bet159DwAQji8DTCTtS0ePDG9Q3wkABOPLABPpW5hv7auOvO+fqe8HAH0cXwaYqB4tzA89/+P51pT6ngDQp/FlgIlqVmforurAe05X3xkAejy+DDBR/VqYb3Wqx877ZfXdAaCH48sAE9W0ztDXqi8Pn62+QwD0aHwZYKIa1xn6i6oz8k/UdwmAHowvA0xU7xY6Q4f4O2HA4PgywEQJ1Bm6U32vAOjy+DLARGn04/nWv1bfLwC6OL4MMFE6/064OvLec9T3DIAujS8DTJROC52hB9R3DYAujS8DTJRY/BIHwMb4MsBEidVpfUV97wCN143xZYCJ0mvhSOsy9f0DNFa3xpcBJkrztyep7yCgkbo5vgwwUXotzA8drb4w9E71XQQ0SrfHlwEmSrOF+dY16vsIaIxejC8DTJRonaEj6jspNVMzU29uFyH3RbjPF+EvfBF+kJX5s1mZP5GV+Z3t2ckNrnJvUv+caMj4MsBEabbQab1cHRx+u/puSkV7dnJTVoS/9GWoTloR/mx87wRfckPvx5cBJkq5oU3q+6nuduzY8Uu+zG/yRTh2yvF9pazMf5KV+UfUPzuMjy8DTJRuC/Ota9V3VJ1tOrjp7b7MZ5c6vCf40/AO9WeA4fFlgImS7l71PVVX2b7s3b4Mj0eP7/EBPjY+Ozmm/iwwOr4MMFHC8SrWCfnZydW+CN9Z0fj+Q/k3zvv09n904v9LMKef48sAEyVcp/WU+r6qm6zMx7Mi/LA74/vK3wnvnZhUfy4YHF8GmCjdFuaHnlPfWXWSlfm1i1+g6ub4vvKn4PvVnw0Gx5cBJkq3hfnWS+p7qw6mZqbekhVhZ/eH95U/ARfhr9WfEQbHlwEmSjvXcJtnpt7hi9Dp1fi+8mWsv1N/ThgcXwaYKO1cg/k9V7538U+nPR3fV1J/VhgcXwaYKO1cQ2V7JzYuPiXZj/FlgA2qw/gywERp5xrIl/m0L/OFfo0vA2xMXcaXASZKO9ewX6bgi3BLP4eXATamTuPLABOlnWuIqZmpM3wR5hTjywAbUbfxZYCJ0s415FnJrMyfUI0vA2xAHceXASZKO2fc+N6JC32Zf085vgxw4uo6vgwwUdo5w7Jiciorwovq8WWAE1bn8WWAidLOWVS5N/XuWUkGuDHqPr4MMFHaOWPGDoydnhVhl3pwGeDEpTC+DDBR2jlD/CN+wBfhiHpsGeDEpTK+DDBR2jkjstnJoawI31QPLQOcuJTGlwEmSjtngC/CZl/mz6tHlgFOXGrjywATpZ1LXFaG7b4IR9UDywAnLsXxZYCJ0s6l/azkHephZYANSHV8GWCitHMJmtg7caYv8/3qUWWADUh5fBlgorRzicn2XPlrWRGeVA8qA2xA6uPLABOlnUvIeJmvy8r8WfWYMsAGWBhfBpgo7VwistnJD/gy/3v1kHoGOH1WxpcBJko7l8azktf5IhxTj6hngNNnaXwZYKK0czU2uvOqt2Zlvls9np4BtsHa+DLARGnnamrL7OQ5WZl/VT2cngG2weL4MsBEaedqqD3XHs6K8G31aHoG2Aar48sAE6WdqxlfhK2+CC+oB9MzwDZYHl8GmCjtXI1kRbimTr/D1zPAabM+vgwwUdq5GhjtjJ7my/xu9Uh6BtiOJowvA0yUdup7cvPM1Dt8EQ6rB9IzwHY0ZXwZYKK0U96T7bn2e7Iy/7p6HD0DbEeTxpcBJko71T3pi3BJVoTn1MPoGWA7mja+DDBR2inuyXaZX+3LfEE9ip4BtqOJ48sAE6Wd5FnJGgyiZ4DtaOr4MsBEadevO3JqZuqMrMz3qofQM8C2NHl8GWCitOvHHZnty96dlfkT6hH0DLAtTR9fBpgo7Xp9R46X+Spf5n+jHkDPANvC+DLARKnXyzsy2zvx61kRXlSPn69BvTznxmF8GWAiC/Xwy1bXWn1W0jPAOowvA0xkpW7fj2MHxk73RbhPPXi+ZnX7nBuJ8WWAiSzVzfsxFOEsX4Qj6rHzNayb59xIjC8DTGStbt2P7bn2+7IiPK0eOl/TunXOjcT4MsBEFuvG/eiLsNmX+fPqkfM1rhvn3EiMLwNMZLWV3o9ZGbY37VlJzwD3B+PLABNZLvZunJqZenNW5p9SD5tPpO4uUwMwvgwwkfVi7saJvRNnZmW+Tz1qPqG6v1CGMb4MMFETWu7d2J5r/2pWhCfVg+YTqzdLZRDjywATNaXl3I2+CGuzMn9WPWY+wXq3WIYwvgwwUZNa6t3oy/z9WZn/SD1kqeZwcowvA0zUtJb8O3yLcEw9Yinn8MYYXwaYqImd7F4c3XnVW7MiPKAeLws5nBjjywATNbU3uhe3zE6ek5X5V9XDZSWH12N8GWCiJneie7E91x72Zf4t9WhZyuHnMb4MMFHT+8V70Rdhqy/CC+rBspbDzzC+DDAR/fwAZ0W4ht/hGxjgXmJ8GWAiOt7inTjaGT0tK8Jd6pGynAPjywAT0WvL9me/kpX5IfVAWc81HePLABPRz3rqQKvyRf4N9Tg1IddkjC8DTEQ/6/G5kWr0htXyYWpKrqkYXwaYiH7W7O6R6rwdq6vhjzLAngHuHcaXASai4y10WtWdO0d+Oryvph6mpuSahvFlgInoeD881KquuWPVz40vAxwY4F5gfBlgIjredw+2qvffeu7rxpcBDgxwtzG+DDARHe/J/cPV5htPPL4McGCAu4nxZYCJ6HgHZ0aqC6478fAywIEB7ibGlwEmouPt2jVSrfrYyceXAQ4McDcwvgwwEbWqHx1uVb979+u/bMUABwa4FxhfBpiIWtXfPjZc/ebtSx9fBjgwwCvB+OpTXzpE1KqefnS4at/8xl+2YoADA9xNjG89Ul88RE3vy+VwdfH1yxteBjgwwLEY3/qkvnyImtzDu0eq1a88K8kAh9rmrPjzyzfeph4dYoCJlL3caVW3/8ny/r6XAQ4M8Er981ueqag+AcuhHi4LvXCoVX3oU8v/+14GODDAK6UeHGKAEU89Xqn3zMFW9Rtv8KwkAxxqm7NCPTjEACOeesBS7n/NDVcbbuje+DLAgQFeLvXgEAOMeOoRS7VHZ4ZP+awkAxxqm7NCPTjEACOeesgsPyvJAIfa5qxQDw4xwIinHrOUevFwq/rI3d39n5wZ4MAAr4R6cIgBRjz1qKXSc4vPSt7W2/FlgAMDvFzqwSEGGPHUw5ZCTx9oVf7m3g4vAxwY4BjqwSEGGPHU41b3vliMRD8ryQCH2uasUA8OMcCIpx64OvfQAyt7VpIBDrXNWaEeHGKAEU89cpaflWSAQ21zVqgHhxhgxFOPXR2flfx3XXpWkgEOtc1ZoR4cYoARTz14deo7B1vVVBeflWSAQ21zVqgHhxhgxFOPXl362txwdXmXn5VkgENtc1aoB4cYYMRTD18dOjAzUq3pwbOSDHCobc4K9eAQA4x46vFTttBpVfd8dqQa6dGzkgxwqG3OCvXgEAOMeOoRVD4r+eG7NN90ZoCDPGeFenCIAUY89RAqeu6xVnVVH56VZIBDbXNWqAeHGGDEU49hv/vLzw9XW27UDy0DHBjgblAPDjHAiKcexH72p8Vwta6Pz0oywKG2OSvUg0MMMOKpR7Gfz0qeW6MvWzHAgQHuBvXgEAOMeOph7Mezkjf+5/p92YoBDgxwN6gHhxhgxFMPZC97/gvD1Qf/MJ3xZYADA7xc6sEhBhjx1CPZq779aKvKb6nnN50Z4CDPWaEeHGKAEU89lL3oibnhav0N+jFlgENtc1aoB4cYYMRTj2W3+/xD9XlWkgEOtc1ZoR4cYoARTz2Y3XxW8s6d9XpWkgEOtc1ZoR4cYoARTz2c3ejvDg9X19bwWUkGONQ2Z4V6cIgBRjz1eK607x0crv7VJ9L7shUDHBjgblAPDjHAiKce0JX09f2Lz0raGV8GODDAy6UeHGKAEU89orEdmR2u1l5va3wZ4MAAL5d6cIgBRjz1kMa0a9dItSrxL1sxwIEB7gb14BADjHjqMV1OL3Va1ccTelaSAQ61zVmhHhxigBFPPapL7fuPtarp2+39T84McGCAV0I9OMQAI556WJfSNx8dTvJZSQY41DZnhXpwiAFGPPW4nqrH50aq0USflWSAQ21zVqgHhxhgxFMP7Mma/dxIdd4O/SgywPZyVqgHhxhgxFOP7MmelVSPIQNsN2eFenCIAUY89die6FnJ/3hnM/6+lwEODPBKqQeHGGDEUw/ua/vuwVb1gT9o7vgywIEBXi714BADjHjq0X21/23wWUkGONQ2Z4V6cIgBRjz18C7W2TNi8llJBjjUNmeFenCIAUY89fhaflaSAQ61zVmhHhxigBFP+azk733a9rOSDHCobc4K9eAQA4x4ivH928eGq9+6nfFlgAMDvFLqwSEGGPH6Pb5PPzpcTdzM3/cywIEB7gb14BADjHj9HN//uXe4Uc9KMsChtjkr1INDDDDi9Wt8Z3c371lJBjjUNmeFenCIAUa8Xg9vk5+VZIBDbXNWqAeHGGDE6+X4/vBQq7rmDr5sxQCH2uWsUA8OMcCI18tnJd9/K1+2YoBDLXNWqAeHGGDE68X4Prl/uNrMs5IMcFnfnBXqwSEGGPG6Pb7/9eHh6oLr9EOWauphakrOCvXgEAOMeN0cX56VZIB9Ijkr1INDDDDidWN4f3S4Vf3u3XzZigEOyeSsUA8OMcCI141nJX+TZyUZ4DKtnBXqwSEGGPFWMr5PH2hVbZ6VZIDL9HJWqAeHGGDEix3fLxXD1cXX6wfLWuphakrOCvXgEAOMeDHj+/DukWo1z0oywAnnrFAPDjHAiLec4X2506pu/xP+vpcBTj9nhXpwiAFGvKWO7wuHWtVv38Hf9zLANnJWqAeHGGDEW8r4PnOwVf0Gz0oywIZyVqgHhxhgxDvV+P7ZI8PVhhsYXwbYVs4K9eAQA4x4JxvfR2d4VpIBtpmzQj04xAAj3hv9Dt97Psuzkgyw3ZwV6sEhBhjxfnF8Xzzcqn7nLr7pzADbzlmhHhxigBHvteP73GPD1b+5nb/vZYDt56xQDw4xwIj36vj+1edb1dhN+gFqeuphakrOCvXgEAOMeIvj+8XZkWodz0rWIvUwNSVnhXpwiAFGvIce4FnJOqUepqbkrFAPDjHAiLf+no3V8MfOkw8PMcCeAV4+9eAQA4x4i5fRxvvGqpHrzpePDzHAngFeHvXgEAOMeK9eSFt2Z9Xqj18gH6Cmpx6mpuSsUA8OMcCI99pLaevDE9WaW9fKR6jJqYepKTkr1INDDDDi/eLFlM3m1dpPXiofoqamHqam5KxQDw4xwIh3wguqCNVlf7yhGvkoX85igG3mrFAPDjHAiHeyS2rDvZurkR2MMANsL2eFenCIAUa8U11Um+8fr869fo18mJqSepiakrNCPTjEACPeUi6rrQ+1q/Nvukg+Tk1IPUxNyVmhHhxigBFvqRfW+OxEdeFtF8sHynrqYWpKzgr14BADjHjLuriKUF1y13r5SFlOPUxNyVmhHhxigBEv5vJaf88mnq9kgJPOWaEeHGKAES/2Alt8vnIVz1cywInmrFAPDjHAiLeSS2zswaw670aer2SAQ3I5K9SDQwww4q30Ihvfw/OVDHBILmeFenCIAUa8blxmWcHzlQxwSCpnhXpwiAFGvG5eaqOfvoLnKxngKoWcFerBIQYY8bp9sW3YyfOVDHCofc4K9eAQA4x4vbjctuwer1bfwPOVDHCobc4K9eAQA4x4vbrgts60q/Nv5vlKBjjUMmeFenCIAUa8Xl5y2Z68uojnKxngsn45K9SDQwww4vX8sitCdendl8uHLZXUw9SUnBXqwSEGGPH6deFd/pmN1QjPVzLAZT1yVqgHhxhgxOvnpbfpv2ytVvG7hRngUp+zQj04xAAjXr8vvi0P+uq8j18oH7q6ph6mpuSsUA8OMcCIp7j8eL6SAfYMcHeoB4cYYMSTXYJFqNbdcZl88OqWepiakrNCPTjEACOe+iLk+UoG2DPA8dSDQwww4qkvwsWu+Ozi7xZmhBngwAAvl3pwiAFGPPVF+Gqbd2c8X8kAVwzwMqkHhxhgxFNfhK97vvKWZj9fqf7/QVNyVqgHhxhgxFNfhCf63cIX3d7c3y2sPv+m5KxQDw4xwIinvghPWIOfr5SffUNyVqgHhxhgxFNfhCdr/Wc2Ne75SvWZNyVnhXpwiAFGPPVFeKo23d+s5yvV592UnBXqwSEGGPHUF+FSGlt8vvLGZjxfqT7rpuSsUA8OMcCIp74Il9r4wxPVBbeukw8kA2wjZ4V6cIgBRjz1RbisilBdfMeofCQZ4PRzVqgHhxhgxFNfhLHPVw5/TD+WDHC6OSvUg0MMMOKpL8LYNt63pRox+Hyl+lybkrNCPTjEACOe+iJcSVt2Z9W5N1wgH00GOCSXs0I9OMQAI576Ilxp48aer1SfZ1NyVqgHhxhgxFNfhN16vnLtJy+RjycDHJLJWaEeHGKAEU99EXb9+crEv5wlP8eG5KxQDw4xwIinvgi73YZ7N1cjO9L9cpb6/JqSs0I9OMQAI576IuzV85XnJvp8pfrsmpKzQj04xAAjnvoi7FWpPl+pPrem5KxQDw4xwIinvgh72fievLrgDy6WjyoDHGqXs0I9OMQAI576Iux5RajW/VE6z1fKz6shOSvUg0MMMOKpL8J+tf6ejUl8Q1p9Tk3JWaEeHGKAEU99EfazjfeNVSPXnS8fWQY4yHNWqAeHGGDEU1+E/W7L57JqdY2fr1SfT1NyVqgHhxhgxFNfhKrfLbzm99fKx5YBDrKcFerBIQYY8dQXoapsNq8u+uSl8sFlgIMkZ4V6cIgBRjz1RSitCNVlf7yhVl/Okp9JQ3JWqAeHGGDEU1+EdWjDzvo8X6k+i6bkrFAPDjHAiKe+CGv1fOXv6b8hrT6HpuSsUA8OMcCIp74I69TWGV+df7P2+Ur1GTQlZ4V6cIgBRjz1RVi3xmcnqgs/oXu+Uv35m5KzQj04xAAjnvoirGVFqC65az0DbDhnhXpwiAFGPPVFWP/nK/v75Sz1Z25Kzgr14BADjHjqi7DuXbFrrFrVx+cr1Z+3KTkr1INDDDDiqS/CFBp7MKtWf7w/X85Sf9am5KxQDw4xwIinvghTaevDE9UFv7+OATaSs0I9OMQAI576Ikzt+cq1f9jb5yvVn7EpOSvUg0MMMOKpL8IUG/30FdXIR3vz5Sz1Z2tKzgr14BADjHjqizDVNtzbm+cr1Z+rKTkr1INDDDDiqS/ClNt8/3h17vVrGOAyvZwV6sEhBhjx1Bdh6m19qF2df9NFDHCZVs4K9eAQA4x46ovQyvOVF33iEga4TCdnxeC2+Yrqk/o/2ESNrEvPV8o/R0NyVqgHhxhgorq0/p5NK3q+Uv3zNyVnhXpwiAEmqlMbV/B8pfpnb0rOCvXgEANMVLe2POir8268gAEu65mzQj04xAAT1bHxPRPVmlvXMsBl/XJWqAeHGGCiupYVebVuGc9Xqn/epuSsUA8OMcBEVp6vVP+cTclZoR4cYoCJUuiKnad+vlL9MzYlZ4V6cIgBJkqlzbvHq9U3vPHzleqfryk5K9SDQwwwUUptnWlX59984ucr1T9bU3JWqAeHGGCi1Mr25NVFt13MAJeanBXqwSEGmCjJilBdevflDHDZ/5wV6sEhBpgo5S7/zMZq5JXnK9U/S1NyVqgHhxhgotTbdP/WatX1a+Q/R1NyVqgHhxhgIguNPZhVvsi/of45mpCzQj04xAATWSnbn/1KVuaH1D+H9ZwV6sEhBpjISot36mhn9LSsCHepfxbLOSvUg0MMMJGVXnu3ZkW4Jivzn6h/Jos5K9SDQwwwkZV+8X71Rdjqi/CC+ueylrNCPTjEABNZ6UR3bHuuPezL/Fvqn81Szgr14BADTGSlN7pnt8xOnpOV+VfVP5+VnBXqwSEGmMhKJ7trR3de9dasCA+of0YLOSvUg0MMMJGVTnnhVu5NWZlf54twTP2zppyzQj04xAATWWmp964v8/dnZf4j9c+bas4K9eAQA0xkpeXcvb4Ia7Myf1b9M/sEc1aoB4cYYCIrLff+bc+1fzUrwpPqn9snlrNCPTjEABNZKeYOntg7cWZW5vvUP7tPKGeFenCIASayUuw9PDUz9easzD+l/vl9Ijkr1INDDDCRlVZ6H2dl2O7LfEH9OXzNc1aoB4cYYCIrdeNO9kXY7Mv8efVn8cbPuRbUg0MMMJGVunUvt+fa78uK8LT683jj5yynHhxigIms1M27ORThLF+EI+rP5I2fs5R6cIgBJrJSt+/nsQNjp/si3Kf+XN74OcuoB4cYYCIr9eSSPv585bX8buHQ23NWUA8OMcBEVurlXZ3tnfj1rAgvqj+jN37OfaUeHGKAiazU6/t6vMxX+TL/G/Xn9MbPuW/Ug0MMMJGV+nFnZ/uyd2dl/oT6s3rj59wX6sEhBpjISv26t6dmps7Iynyv+vN64+fcc+rBIQaYyEp9vbxf/d3CNfjc3vI595J6cIgBJrKS4g5vl/nVTXu+0lmhHhxigImspLrHfREuyYrwnPrze+Pn3HXqwSEGmMhKyru8Pdd+T1bmX1efgTd+zl2lHhxigImspL7PN89MvcMX4bD6HLzxc+4a9eAQA0xkJVcDo53R03yZ360+C2/8nLtCPTjEABNZydVIVoRrrD5f6axQDw4xwERWcjXji7DVF+EF9bl44+ccTT04xAATWcnVUHuuPZwV4dvqs/HGzzmKenCIASaykqupLbOT52Rl/lX1+Xjj57xs6sEhBpjISq7GRnde9daszHerz8gbP+dlUQ8OMcBEVnJ19+rzlUU4pj4rb/mcl0o9OMQAE1nJJSKbnfyAL/O/V5+XN37Op6QeHGKAiazkEjJe5uuyMn9WfWbWz/mk1INDDDCRlVxisj1X/lpWhCfV52b9nN+QenCIASaykkvQxN6JM32Z71efnfVzPiH14BADTGQll6ipmak3+yLcoT4/6+f8OurBIQaYyEoucVkZtvsiHFWfo/Vz/gfqwSEGmMhKzgBfhM2+zJ9Xn6X1c/4p9eAQA0xkJWdENjs5lBXhm+rztH7ODHDNUv8Hm4jic4b4R/yAL8IR9ZmaPmf14BADTGQlZ8zYgbHTsyLsUp+r2XNWDw4xwERWchZVP32+8to6/W5hZ4V6cIgBJrKSMywrJqeyIryoPmNT56weHGKAiazkjBvfO3GhL/Pvcc5doh4cYoCJrOQaINuXvTsr8yc45y5QDw4xwERWcg0xNTN1hi/CHOe8QurBIQaYyEquQaaOP195C+e8AurBIQaYyEqugXyZT/syX+CcI6gHhxhgIiu5hsr2Tmz0RfgB57xM6sEhBpjISq7B/J4r35sV4a8552VQDw4xwERWcg23eWbqHb4InV6ecVbm/89ZMbit87J6dIgBJkq+Irykvs/rYGpm6i1ZEXb27qzzbzgrBrd1vq8eHWKAiVIvK8Jz6vu8TrKePV+Z3++sGNg2/y316BADTJR++VPq+7xusjIfz4rww26ec7sIubNiYNv8f1OPDjHARMlXhC+r7/M68rOTq30RvtOdc87/arQzepqzYmBb5z716BADTJR6WRHuVd/ndX6+0pfh8RWdb5n/JCvzLc6Sgen5j6hHhxhgotRb/DtP9X1eZ5sObnq7L/PZFZzvR5w1g9OHt6hHhxhgotRbfIxCfZ/X3Y4dO37Jl/lNvgjHlnyuZf7jrMz/k7PonO2Pv41/ilSf1JcIES2/rMxf9o/4t6nv81T4Mr8iK8KTSzjXJ9p7rrzYWTYwPf9F9fAQA0yUalmZz6vv8RT/NNwugs+K8JmsCF/zZf5/fJl/15f5/8jK/FPjeycuc5V7k7NuYHr+P6iHhxhgomSbnfyQ+h5Hos6++gvvHJyeP6oeH2KAiZKrCEfbc+13qu9xJGxwen6/enyIASZKrawIj6jvbyTurKs769XjQwwwUWplZX6p+v6GAXwZS5/6MiGipceXr9A1Z00f2aAeoKanvlCIaIkV4dhPv6kLdMvg9Pzn1CPU5OSXChEtqawIu9T3NYwZ2H7knMHp+efVQ9TU1JcKEZ26rAj/d3xm6l3q+xoGDW6fn1IPUVNTXyxEtJTyf6m+p2HYwPT83eoxamL6i4WITtbiK03q+xnGvee3D5w+uK1zSD1ITUt9uRDRSSrCY1MzU29R389ogLN+60tnDk53nlCPUpOSXzBEdMKyIvz5xpmpX1bfy2iQd/7bL589uK3zNfUwNSX1JUNEJ+zxydnJs9X3MRpo8IOdMwamOwfV49SEanDRENFrysr80NiBsX+svofR8L8THtjWuVM9UNZTXzZE9JqKcAd/54t6/RMl/p0wA0xk/d/5FuFK9X0LvM7gB39+CekAAAGUSURBVDvvGpie3zW4rXNMPVjWUl88RE0vK/N9Y7OT/1R9zwJL+A1KnT9Vj5al1JcPUWMrwhHedkZyBrYfuWxw2/y+wen5o+oBSz35JUTUpIpwdPH3+fIrBWHinywNbJu/ZnC6c2Rgev4l9ZilmPxCIrJeEV5a/DWCfnbyQ/zTIph0zvbH33b21fObBrd3Pjywbf7egenOVwa2dZ4a3Nb5/uC2zsvqoatr8suJyEBZmb/sy/z7vsyfysr8K1kR7vVF+HB7dnKTf8S/TX0/AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC55/x8Gkc1/DnCukQAAAABJRU5ErkJggg=="
+  }
+}
