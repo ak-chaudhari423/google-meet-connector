@@ -7,7 +7,7 @@ The Google Meet Connector for Camunda 8 enables users to create instant Google M
 ---
 ## Connector UI
 
-![Alt text](<Screenshot 2026-06-24 003142.png>)
+<img width="948" height="478" alt="connector" src="https://github.com/user-attachments/assets/e34c4379-99c2-4867-bff8-0504ec5bb3a1" />
 
 ## Features
 
