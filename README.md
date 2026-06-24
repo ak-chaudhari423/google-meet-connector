@@ -32,7 +32,7 @@ The Google Meet Connector for Camunda 8 enables users to create instant Google M
 
 ### Setting Up in Saas/Self managed Environment:
 1.	Navigate to Camunda SaaS.
-2.	Upload the connector template from https://github.com/ak-chaudhari423/google-meet-connector/blob/google-meet-connector.json or download it from marketplace.
+2.	Upload the connector template from https://github.com/ak-chaudhari423/google-meet-connector/blob/main/connector-template/google-meet-connector.json or download it from marketplace.
 
 ---
 
